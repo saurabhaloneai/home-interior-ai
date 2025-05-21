@@ -1,1 +1,0 @@
-# home-interior-ai
