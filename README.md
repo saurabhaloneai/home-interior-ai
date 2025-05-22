@@ -52,7 +52,7 @@ This web application allows users to redesign interior spaces using AI-powered i
 
 1. Start the server:
    ```
-   python server.py
+   uv run server.py
    ```
 
 2. Open your browser and navigate to:
