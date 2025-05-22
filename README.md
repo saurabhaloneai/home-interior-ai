@@ -30,19 +30,17 @@ This web application allows users to redesign interior spaces using AI-powered i
 
 2. Install UV (if you don't have it already):
    ```
+   # Install UV (if not already installed)
    curl -fsSL https://astral.sh/uv/install.sh | bash
-   ```
-   
-   Or on macOS with Homebrew:
-   ```
-   brew install uv
+   # or on macOS with Homebrew
+   # brew install uv
    ```
 
 3. Create a virtual environment and install dependencies with UV:
    ```
    uv venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   uv add flask fal-client
+   uv add flask fal-client torch diffusers
    ```
 
 4. Set up your FAL AI API credentials:
