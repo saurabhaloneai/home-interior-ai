@@ -1,14 +1,20 @@
 import fal_client
 import base64
 import os
+import sys
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify
 import argparse
 import torch
 from diffusers.utils import load_image
-from FLUX_Controlnet_Inpainting.controlnet_flux import FluxControlNetModel
-from FLUX_Controlnet_Inpainting.transformer_flux import FluxTransformer2DModel
-from FLUX_Controlnet_Inpainting.pipeline_flux_controlnet_inpaint import FluxControlNetInpaintingPipeline
+
+# Add the flux-local directory to the Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'flux-local'))
+
+# Import the modules directly
+from controlnet_flux import FluxControlNetModel
+from transformer_flux import FluxTransformer2DModel
+from pipeline_flux_controlnet_inpaint import FluxControlNetInpaintingPipeline
 
 # Initialize Flask app
 app = Flask(__name__)
