@@ -280,7 +280,10 @@ async def generate_image(prompt, image_path, mask_path):
         return output_path
     else:
         # FAL API implementation (your existing code)
-        # ...existing code...
+        # This block is missing proper implementation
+        print("Using FAL API for inference...")
+        # Placeholder implementation - replace with your actual FAL API code
+        return None  # Replace with actual implementation
 
 # Rest of your server code
 # ...existing code...
