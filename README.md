@@ -89,6 +89,39 @@ The application includes several predefined interior design styles:
 - Bohemian
 - Luxury
 
+## Running Local.py
+
+If you want to run the application using the `local.py` script (which uses a local Flask server), follow these steps:
+
+1. Navigate to the project directory:
+   ```
+   cd home-interior-ai
+   ```
+
+2. Install the required dependencies:
+   ```
+   pip install flask_cors
+   pip uninstall diffusers -y
+   pip install git+https://github.com/huggingface/diffusers
+   pip install transformers==4.44.2
+   pip uninstall torch torchvision -y
+   pip install torch==2.3.0 torchvision==0.18.0
+   ```
+
+3. Verify torch and torchvision installations:
+   ```
+   python -c "import torch; import torchvision; print(torch.__version__, torchvision.__version__)"
+   ```
+   This should output: `2.3.0 0.18.0`
+
+4. Run the local server:
+   ```
+   python local.py
+   ```
+
+5. The server will start on http://localhost:5002. Open this URL in your browser to access the application.
+
 ## License
 
 MIT License
+

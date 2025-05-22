@@ -152,8 +152,8 @@ def generate_design():
             control_image = decode_base64_to_image(image_data)
             control_mask = decode_base64_to_image(mask_data)
             
-            # Resize images if needed
-            width, height = 1024, 1024  # Default size
+            # Resize images to rectangular format
+            width, height = 1280, 768  # Default rectangular size (16:9 aspect ratio)
             control_image = control_image.resize((width, height))
             control_mask = control_mask.resize((width, height))
         except Exception as e:
