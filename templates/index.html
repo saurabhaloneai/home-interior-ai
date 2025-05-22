@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interior Design Modification</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <div class="app-header">
+            <h1>Interior Design Modification</h1>
+        </div>
+        
+        <div class="app-container">
+            <div class="input-panel">
+                <div class="input-section">
+                    <h2>Input</h2>
+                    
+                    <!-- Prompt input -->
+                    <div class="input-field">
+                        <label for="promptInput">Prompt</label>
+                        <input type="text" id="promptInput" placeholder="e.g., black bag">
+                    </div>
+                    
+                    <!-- Image URL input -->
+                    <div class="input-field">
+                        <label for="imageInput">Image URL</label>
+                        <div class="url-input-container">
+                            <input type="text" id="imageInput" placeholder="Enter image URL or upload file">
+                            <button id="chooseFileBtn" class="btn btn-secondary">Choose...</button>
+                            <input type="file" id="imageUpload" accept="image/*" style="display:none">
+                        </div>
+                        <div class="file-hint">
+                            You can drag and drop file(s) here, or provide a base64 encoded data URL
+                        </div>
+                    </div>
+                    
+                    <!-- Mask URL input -->
+                    <div class="input-field">
+                        <label for="maskInput">Mask URL</label>
+                        <div class="url-input-container">
+                            <input type="text" id="maskInput" placeholder="Enter mask URL or upload file">
+                            <button id="chooseMaskBtn" class="btn btn-secondary">Choose...</button>
+                            <button id="createMaskBtn" class="btn btn-secondary">Create...</button>
+                            <input type="file" id="maskUpload" accept="image/*" style="display:none">
+                        </div>
+                    </div>
+                    
+                    <!-- Style options -->
+                    <div class="style-section">
+                        <label for="styleSelect">Design Style:</label>
+                        <select id="styleSelect" class="style-select">
+                            <option value="">-- Select a predefined style --</option>
+                            <!-- Options will be loaded from API -->
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="generateBtn" class="btn btn-generate">Run</button>
+            </div>
+            
+            <div class="result-panel">
+                <h2>Result <span class="status-badge">Idle</span></h2>
+                
+                <!-- Loading indicator -->
+                <div id="loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p id="loadingMessage">Generating your design...</p>
+                </div>
+                
+                <!-- Error message -->
+                <p id="errorMessage" class="error-message"></p>
+                
+                <!-- Result display -->
+                <div id="resultContainer" class="result-container hidden">
+                    <div class="image-container">
+                        <img id="resultImage" class="result-image" alt="Generated Design">
+                        <button class="download-icon" id="quickDownloadBtn" title="Download image">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="saveImageBtn" class="btn">Download</button>
+                        <button id="newDesignBtn" class="btn btn-secondary">New Design</button>
+                    </div>
+                    <div class="cost-estimate">
+                        Your request will cost <span class="cost-highlight">$0.03</span> with TURBO, <span class="cost-highlight">$0.06</span> with BALANCED, and <span class="cost-highlight">$0.09</span> with QUALITY.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mask creation modal -->
+    <div id="maskModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Mask</h3>
+                <button id="closeMaskModal" class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="mask-canvas-container">
+                    <canvas id="maskCanvas"></canvas>
+                </div>
+                <div class="mask-tools">
+                    <div class="brush-size-control">
+                        <label>Brush Size:</label>
+                        <input type="range" id="brushSize" min="5" max="60" value="40">
+                        <span id="brushSizeValue">40px</span>
+                        <span class="brush-indicator" title="Brush color: red"></span>
+                    </div>
+                    <div class="mask-buttons">
+                        <button id="undoBtn" class="btn btn-icon">&larr;</button>
+                        <button id="redoBtn" class="btn btn-icon">&rarr;</button>
+                        <button id="downloadMaskBtn" class="btn">Download Mask</button>
+                        <button id="useMaskBtn" class="btn btn-success">Use Mask</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
