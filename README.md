@@ -54,7 +54,13 @@ This web application allows users to redesign interior spaces using AI-powered i
 
 1. Start the server:
    ```
-   uv run server.py
+   # using fal api 
+   uv run server.py --model fal
+   ```
+
+   ```
+   # using local gpu
+   uv run server.py --model flux
    ```
 
 2. Open your browser and navigate to:
