@@ -8,14 +8,16 @@ This web application allows users to redesign interior spaces using AI-powered i
 - Create custom masks to specify areas for redesign
 - Choose from predefined design styles (Modern, Scandinavian, Industrial, etc.)
 - Enter custom design prompts for unique modifications
-- Real-time image processing using FAL AI models
+- Real-time image processing using FAL AI models or local FLUX model
 - Download generated design images
 
 ## Tech Stack
 
 - **Backend**: Python with Flask
 - **Frontend**: HTML, CSS, JavaScript
-- **AI Models**: FAL AI models (Ideogram and Flux)
+- **AI Models**: 
+  - FAL AI models (Ideogram and Flux)
+  - Local FLUX Controlnet Inpainting model
 - **Package Manager**: UV (modern, faster Python package manager)
 
 ## Installation

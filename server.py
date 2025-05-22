@@ -3,6 +3,12 @@ import base64
 import os
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify
+import argparse
+import torch
+from diffusers.utils import load_image
+from FLUX_Controlnet_Inpainting.controlnet_flux import FluxControlNetModel
+from FLUX_Controlnet_Inpainting.transformer_flux import FluxTransformer2DModel
+from FLUX_Controlnet_Inpainting.pipeline_flux_controlnet_inpaint import FluxControlNetInpaintingPipeline
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -207,7 +213,79 @@ def generate_design():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-if __name__ == '__main__':
+# Add argument parser
+parser = argparse.ArgumentParser(description="Home Interior AI Server")
+parser.add_argument("--model", type=str, choices=["fal", "flux"], default="fal",
+                   help="Choose inference model: 'fal' for FAL API or 'flux' for FLUX Controlnet Inpainting")
+args = parser.parse_args()
+
+# Initialize models based on selected option
+if args.model == "flux":
+    print("Initializing FLUX Controlnet Inpainting model...")
+    # Initialize FLUX model
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    
+    controlnet = FluxControlNetModel.from_pretrained(
+        "alimama-creative/FLUX.1-dev-Controlnet-Inpainting-Alpha", 
+        torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32
+    )
+    
+    transformer = FluxTransformer2DModel.from_pretrained(
+        "black-forest-labs/FLUX.1-dev", 
+        subfolder='transformer', 
+        torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32
+    )
+    
+    flux_pipe = FluxControlNetInpaintingPipeline.from_pretrained(
+        "black-forest-labs/FLUX.1-dev",
+        controlnet=controlnet,
+        transformer=transformer,
+        torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32
+    ).to(device)
+    
+    if device == "cuda":
+        flux_pipe.transformer.to(torch.bfloat16)
+        flux_pipe.controlnet.to(torch.bfloat16)
+else:
+    print("Using FAL API for inference...")
+    # Initialize FAL API client (your existing code)
+    # ...existing code...
+
+# Modify the existing inference function to handle both options
+async def generate_image(prompt, image_path, mask_path):
+    if args.model == "flux":
+        # FLUX Controlnet Inpainting implementation
+        size = (768, 768)
+        image = load_image(image_path).convert("RGB").resize(size)
+        mask = load_image(mask_path).convert("RGB").resize(size)
+        generator = torch.Generator(device=device).manual_seed(24)
+        
+        result = flux_pipe(
+            prompt=prompt,
+            height=size[1],
+            width=size[0],
+            control_image=image,
+            control_mask=mask,
+            num_inference_steps=28,
+            generator=generator,
+            controlnet_conditioning_scale=0.9,
+            guidance_scale=3.5,
+            negative_prompt="",
+            true_guidance_scale=1.0
+        ).images[0]
+        
+        # Save the result to a file
+        output_path = "output.png"
+        result.save(output_path)
+        return output_path
+    else:
+        # FAL API implementation (your existing code)
+        # ...existing code...
+
+# Rest of your server code
+# ...existing code...
+
+if __name__ == "__main__":
     # Create directories if they don't exist
     os.makedirs('static/css', exist_ok=True)
     os.makedirs('static/js', exist_ok=True)
