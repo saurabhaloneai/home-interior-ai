@@ -92,6 +92,7 @@ The application includes several predefined interior design styles:
 ## Running Local.py
 
 If you want to run the application using the `local.py` script (which uses a local Flask server), follow these steps:
+> after huggingface login 
 
 1. Navigate to the project directory:
    ```
@@ -100,12 +101,14 @@ If you want to run the application using the `local.py` script (which uses a loc
 
 2. Install the required dependencies:
    ```
+   pip install flask 
    pip install flask_cors
    pip uninstall diffusers -y
    pip install git+https://github.com/huggingface/diffusers
    pip install transformers==4.44.2
    pip uninstall torch torchvision -y
    pip install torch==2.3.0 torchvision==0.18.0
+   pip install sentencepiece 
    ```
 
 3. Verify torch and torchvision installations:
