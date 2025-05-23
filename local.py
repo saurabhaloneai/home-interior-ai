@@ -61,21 +61,27 @@ def load_model():
     if pipe is None:
         print("Loading SD3 ControlNet model...")
         try:
-            controlnet = FluxControlNetModel.from_pretrained("alimama-creative/FLUX.1-dev-Controlnet-Inpainting-Alpha", torch_dtype=torch.bfloat16)
+            # Choose one precision format based on what your GPU supports
+            # Most modern NVIDIA GPUs support float16 well
+            precision_format = torch.bfloat16
+            
+            controlnet = FluxControlNetModel.from_pretrained(
+                "alimama-creative/FLUX.1-dev-Controlnet-Inpainting-Alpha", 
+                torch_dtype=precision_format
+            )
             transformer = FluxTransformer2DModel.from_pretrained(
-                    "black-forest-labs/FLUX.1-dev", subfolder='transformer', torch_dtype=torch.bfloat16
-                )
+                "black-forest-labs/FLUX.1-dev", 
+                subfolder='transformer', 
+                torch_dtype=precision_format
+            )
             pipe = FluxControlNetInpaintingPipeline.from_pretrained(
                 "black-forest-labs/FLUX.1-dev",
                 controlnet=controlnet,
                 transformer=transformer,
-                torch_dtype=torch.bfloat16
+                torch_dtype=precision_format
             )
             # Move models to correct device
             device = "cuda" if torch.cuda.is_available() else "cpu"
-            if device == "cuda":
-                pipe.text_encoder.to(torch.float16)
-                pipe.controlnet.to(torch.float16)
             pipe.to(device)
             print(f"Model loaded successfully on {device}")
         except Exception as e:
@@ -169,7 +175,7 @@ def generate_design():
         try:
             generator = torch.Generator(device=device).manual_seed(24)
             result_image = pipe(
-                negative_prompt="deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated hands and fingers, disconnected limbs, mutation, mutated, ugly, disgusting, blurry, amputation, NSFW",
+                negative_prompt='',
                 prompt=final_prompt,
                 height=height,
                 width=width,
@@ -177,8 +183,8 @@ def generate_design():
                 control_mask=control_mask,
                 num_inference_steps=28,
                 generator=generator,
-                controlnet_conditioning_scale=0.95,
-                guidance_scale=7,
+                controlnet_conditioning_scale=0.9,
+                guidance_scale=3.5,
                 true_guidance_scale=1.0 
             ).images[0]
             
