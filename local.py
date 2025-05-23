@@ -7,9 +7,12 @@ from PIL import Image
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from diffusers.utils import load_image
-from diffusers.pipelines import StableDiffusion3ControlNetInpaintingPipeline
-from diffusers.models.controlnets.controlnet_sd3 import SD3ControlNetModel
+# from diffusers.pipelines import StableDiffusion3ControlNetInpaintingPipeline
+# from diffusers.models.controlnets.controlnet_sd3 import SD3ControlNetModel
 
+from controlnet_flux import FluxControlNetModel
+from transformer_flux import FluxTransformer2DModel
+from pipeline_flux_controlnet_inpaint import FluxControlNetInpaintingPipeline
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -17,6 +20,7 @@ CORS(app)  # Enable CORS for all routes
 # Global variables to store the loaded model
 pipe = None
 controlnet = None
+transformer = None 
 
 # Predefined styles with carefully crafted prompts
 PREDEFINED_STYLES = {
@@ -52,22 +56,21 @@ PREDEFINED_STYLES = {
 
 def load_model():
     """Load the SD3 model with ControlNet for inpainting"""
-    global pipe, controlnet
+    global pipe, controlnet, transformer
     
     if pipe is None:
         print("Loading SD3 ControlNet model...")
         try:
-            controlnet = SD3ControlNetModel.from_pretrained(
-                "alimama-creative/SD3-Controlnet-Inpainting", 
-                use_safetensors=True, 
-                extra_conditioning_channels=1
-            )
-            pipe = StableDiffusion3ControlNetInpaintingPipeline.from_pretrained(
-                "stabilityai/stable-diffusion-3-medium-diffusers",
+            controlnet = FluxControlNetModel.from_pretrained("alimama-creative/FLUX.1-dev-Controlnet-Inpainting-Alpha", torch_dtype=torch.bfloat16)
+            transformer = FluxTransformer2DModel.from_pretrained(
+                    "black-forest-labs/FLUX.1-dev", subfolder='transformer', torch_dtype=torch.bfloat16
+                )
+            pipe = FluxControlNetInpaintingPipeline.from_pretrained(
+                "black-forest-labs/FLUX.1-dev",
                 controlnet=controlnet,
-                torch_dtype=torch.float16,
+                transformer=transformer,
+                torch_dtype=torch.bfloat16
             )
-            
             # Move models to correct device
             device = "cuda" if torch.cuda.is_available() else "cpu"
             if device == "cuda":
@@ -176,7 +179,10 @@ def generate_design():
                 generator=generator,
                 controlnet_conditioning_scale=0.95,
                 guidance_scale=7,
+                true_guidance_scale=1.0 
             ).images[0]
+            
+      
             
             # Convert result to base64
             result_base64 = encode_image_to_base64(result_image)
